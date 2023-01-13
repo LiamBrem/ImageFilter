@@ -1,6 +1,8 @@
 from PIL import Image, ImageFilter
 import os
+import time
 
+firstIteration = True
 
 class ImageEditor:
 
@@ -47,7 +49,7 @@ class ImageEditor:
 
 
 def editSequence(img):
-  
+
   # this a list of all the names of the methods in the above class
   method_list = [
     method for method in dir(ImageEditor)
@@ -59,69 +61,79 @@ def editSequence(img):
   for i in range(len(method_list)):
     stringInput += (str(i + 1) + ". " + method_list[i] + "\n")
 
-  stringInput += f"{str(len(method_list) + 1)}. Exit"
-
+  stringInput += f"\n{str(len(method_list) + 1)}. Save\n"
+  stringInput += f"{str(len(method_list) + 2)}. Exit\n"
 
   #main loop
   while True:
     os.system('cls' if os.name == 'nt' else 'clear')
-    
+
     optionInput = input(stringInput)
-    #make it so that the user can only enter a number
-    while not (optionInput.isdigit()):
-      optionInput = input("Please enter a number: ")
-  
+
     #make option input corresponds to the correct method of the above class using if statements
-    if optionInput == 1:
+    if optionInput == "1":
       img.black_white()
-    elif optionInput == 2:
+    elif optionInput == "2":
       img.blur()
-    elif optionInput == 3:
+    elif optionInput == "3":
       img.flip()
-    elif optionInput == 4:
+    elif optionInput == "4":
       img.rotate()
-    elif optionInput == 5:
+    elif optionInput == "5":
       img.sharpen()
-    elif optionInput == len(method_list) + 1:
+    elif int(optionInput) == len(method_list) + 1:
+      os.system('cls' if os.name == 'nt' else 'clear')
+      nameInput = input(
+        "What is the name of the file you want to save? (dont include .jpg/.png): "
+      )
+      img.save(nameInput)
+      optionSequence()
+
+    elif int(optionInput) == len(method_list) + 2:
       break
     else:
-      print("Please enter a number between 1 and " + str(len(method_list) + 1))
-  
-    print(optionInput)
+      print("Please enter a number between 1 and " + str(len(method_list) + 2))
+      time.sleep(3)
 
 
-def optionSequence(fileName):
-  #create image editor object
-  img = ImageEditor(fileName)
+def optionSequence():
+  #this clears the terminal
+  os.system('cls' if os.name == 'nt' else 'clear')
+
+  global firstIteration
+  if firstIteration is True:
+    firstIteration = False
+    fileName = new()      
+    img = ImageEditor(fileName) 
+
   #make a while loop that lets the user call functions from the class through input to edit the image usin input, also let them stop it and save the image
   while True:
     #get the user input
-    user_input = input("What do you want to do?\n1. Edit\n2. Save\n3. Quit\n")
+    user_input = input("What do you want to do?\n1. Edit\n2. Quit\n3. New")
 
     #if the user input is 1, edit the image
     if user_input == "1":
+
+      ###WE HAVE TO MAKE IT SO THAT THE EDIT SEQUENCE RETURNS THE IMAGE OBJECT, GET RID OF SAVE IN EDIT IMAGE AND ADD IT TO THIS MENU
       img = editSequence(img)
 
-    #if the user input is 2, save the image
-    elif user_input == "2":
-      img.save("filteredImages/" + fileName + ".png", "PNG")
-
     #if the user input is 3, quit the program
-    elif user_input == "3":
+    elif user_input == "2":
       os.system('cls' if os.name == 'nt' else 'clear')
       break
+
+    elif user_input == "3":
+      fileName = new()
+      
+      img = ImageEditor(fileName)
 
     #if the user input is anything else, print an error message
     else:
       print("Invalid input, please try again.")
 
-  img.black_white()
-
-  img.save("test")
 
 
-if __name__ == '__main__':
-
+def new():
   correctName = False
 
   while correctName == False:
@@ -132,7 +144,10 @@ if __name__ == '__main__':
 
     #check if the image file exists in uploadImages folder
     if os.path.isfile("uploadImages/" + image_file_name):
-      correctName = True
-      optionSequence("uploadImages/" + image_file_name)
+      return "uploadImages/" + image_file_name
     else:  #if the image file doesn't exist in uploadImages folder
       print('The image file doesn\'t exist in uploadImages folder')
+
+
+if __name__ == '__main__':
+  optionSequence()
