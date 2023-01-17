@@ -1,6 +1,7 @@
 from PIL import Image, ImageFilter
 import os
 import time
+import random
 
 firstIteration = True
 
@@ -43,6 +44,52 @@ class ImageEditor:
   def black_white(self):
     self.image = self.image.convert("L")
 
+  #make a function that contours the image
+  def contours(self):
+    self.image = self.image.filter(ImageFilter.CONTOUR)
+
+  def edgeEnchance(self):
+    self.image = self.image.filter(ImageFilter.EDGE_ENHANCE_MORE)
+
+  def emboss(self):
+    self.image = self.image.filter(ImageFilter.EMBOSS)
+
+  def smooth(self):
+    self.image = self.image.filter(ImageFilter.SMOOTH)
+
+  def randomizer(self):    
+    pixels = self.image.getdata()
+    new_pixels = []
+    for p in pixels:
+      new_pixels.append(p)
+
+    location = 0
+  # Continues until it has looped through all pixels
+    while location < len(new_pixels):
+      # Gets the current color of the pixel at location
+      p = new_pixels[location]
+      # Splits color into red, green and blue components
+      r = p[0]
+      g = p[1]
+      b = p[2]
+
+      changeBy = 50
+
+      newr = random.randint(r-changeBy,r+changeBy)
+      newg = random.randint(g-changeBy,g+changeBy)
+      newb = random.randint(b-changeBy,b+changeBy)
+
+      new_pixels[location] = (newr, newg, newb)
+    # Changes the location to the next pixel in array
+      location += 1
+
+
+    newImage = Image.new("RGB", self.image.size)
+    newImage.putdata(new_pixels)
+    
+      
+    self.image = newImage
+  
   #make a save function that saves the new image to filteredImages file
   def save(self, name):
     self.image.save("filteredImages/" + name + ".png", "PNG")
@@ -76,11 +123,21 @@ def editSequence(img):
     elif optionInput == "2":
       img.blur()
     elif optionInput == "3":
-      img.flip()
+      img.contours()
     elif optionInput == "4":
-      img.rotate()
+      img.edgeEnchance()
     elif optionInput == "5":
+      img.emboss()
+    elif optionInput == "6":
+      img.flip()
+    elif optionInput == "7":
+      img.randomizer()
+    elif optionInput == "8":
+      img.rotate()
+    elif optionInput == "9":
       img.sharpen()
+    elif optionInput == "10":
+      img.smooth()
     elif int(optionInput) == len(method_list) + 1:
       os.system('cls' if os.name == 'nt' else 'clear')
       nameInput = input(
@@ -109,7 +166,7 @@ def optionSequence():
   #make a while loop that lets the user call functions from the class through input to edit the image usin input, also let them stop it and save the image
   while True:
     #get the user input
-    user_input = input("What do you want to do?\n1. Edit\n2. Quit\n3. New")
+    user_input = input("What do you want to do?\n1. Edit\n2. Quit\n3. New\n")
 
     #if the user input is 1, edit the image
     if user_input == "1":
